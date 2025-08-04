@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Viết Lại Câu 50-100/1000</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #FFC107;
+            --background-color: #f0f4f8;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --border-radius: 16px;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 2rem);
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background-color: #43a047;
+        }
+
+        .button.secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .button.secondary:hover {
+            background-color: #FFB300;
+        }
+
+        #splash-screen {
+            display: block;
+        }
+
+        #game-screen,
+        #end-screen {
+            display: none;
+        }
+
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        #ipa-display {
+            font-size: 1.5rem;
+            font-family: monospace;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #e0e6ec;
+            border-radius: var(--border-radius);
+            border: 2px solid #ccc;
+            letter-spacing: 1px;
+            color: var(--text-color);
+            font-weight: 700;
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #vietnamese-meaning {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5rem;
+            min-height: 1.5rem;
+            display: none; /* Ẩn mặc định */
+        }
+
+        /* Thêm hiệu ứng nhấp nháy mới cho câu đúng */
+        .flash-text {
+            animation: flash-animation 0.5s linear infinite alternate;
+        }
+
+        #feedback {
+            min-height: 2rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        #hint-button {
+            display: none;
+            /* Ẩn nút gợi ý mặc định */
+        }
+
+        #hint-display {
+            display: none;
+            /* Ẩn gợi ý mặc định */
+            margin-top: 1rem;
+            font-style: italic;
+            color: #FFC107;
+            font-weight: bold;
+            min-height: 2rem;
+        }
+
+        #end-screen h2 {
+            font-size: 3rem;
+        }
+
+        #end-screen p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .trophy {
+            font-size: 5rem;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes flash-animation {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="splash-screen" class="container">
+        <h1>Trò Chơi Viết Lại Câu 50-100/1000</h1>
+        <p>Viết lại câu hoàn chỉnh dựa trên phiên âm IPA.</p>
+        <input type="text" id="player-name-input" placeholder="Nhập tên của bạn" />
+        <div id="feedback-splash"></div>
+        <button id="start-button" class="button">Bắt đầu</button>
+    </div>
+
+    <div id="game-screen" class="container">
+        <button id="reset-button" class="button secondary" style="position: absolute; top: 1rem; right: 1rem;">Quay lại</button>
+        <div class="score-display">
+            Điểm: <span id="score">0</span> / <span id="total-questions">0</span>
+        </div>
+        <div id="ipa-display"></div>
+        <div id="vietnamese-meaning"></div> <!-- Phần tử mới để hiển thị nghĩa tiếng Việt -->
+        <div id="hint-display"></div>
+        <input type="text" id="answer-input" placeholder="Viết lại câu ở đây" />
+        <div id="feedback"></div>
+        <button id="check-button" class="button">Kiểm tra</button>
+        <button id="hint-button" class="button secondary" style="margin-top: 1rem;">Gợi Ý</button>
+    </div>
+
+    <div id="end-screen" class="container">
+        <span class="trophy">🏆</span>
+        <h2 id="end-message"></h2>
+        <p id="final-score"></p>
+        <button id="play-again-button" class="button">Chơi Lại</button>
+    </div>
+
+    <script>
+        // Mảng dữ liệu mới với câu, IPA và nghĩa tiếng Việt
+        const sentences = [
+            { fullSentence: "Dad cooks dinner for us.", ipa: "/dæd kʊks ˈdɪnər fɔːr ʌs/", vietnamese: "Bố nấu bữa tối cho chúng tôi." },
+            { fullSentence: "Which day do you have art class?", ipa: "/wɪtʃ deɪ duː juː hæv ɑːt klɑːs/", vietnamese: "Bạn có lớp học vẽ vào ngày nào?" },
+            { fullSentence: "What kind of juice do you want to drink?", ipa: "/wɒt kaɪnd ɒv dʒuːs duː juː wɒnt tuː drɪŋk/", vietnamese: "Bạn muốn uống loại nước ép nào?" },
+            { fullSentence: "The boy stands at the front of the classroom.", ipa: "/ðə bɔɪ stændz æt ðə frʌnt ɒv ðə ˈklɑːsruːm/", vietnamese: "Cậu bé đứng ở phía trước lớp học." },
+            { fullSentence: "Nick does a great job on tests!", ipa: "/nɪk dʌz ə ɡreɪt dʒɒb ɒn tests/", vietnamese: "Nick làm bài kiểm tra rất tốt!" },
+            { fullSentence: "We are able to play soccer after school today.", ipa: "/wiː ɑːr ˈeɪbl tuː pleɪ ˈsɒkər ˈɑːftər skuːl təˈdeɪ/", vietnamese: "Hôm nay chúng ta có thể chơi đá bóng sau giờ học." },
+            { fullSentence: "He sees the baby smile.", ipa: "/hiː siːz ðə ˈbeɪbi smaɪl/", vietnamese: "Anh ấy thấy em bé mỉm cười." },
+            { fullSentence: "I send about ten emails a day.", ipa: "/aɪ send əˈbaʊt ten ˈiːmeɪlz ə deɪ/", vietnamese: "Tôi gửi khoảng mười email một ngày." },
+            { fullSentence: "Betty has a small dog.", ipa: "/ˈbeti hæz ə smɔːl dɒɡ/", vietnamese: "Betty có một con chó nhỏ." },
+            { fullSentence: "What time is it now?", ipa: "/wɒt taɪm ɪz ɪt naʊ/", vietnamese: "Bây giờ là mấy giờ?" },
+            { fullSentence: "He needs to write the letter again.", ipa: "/hiː niːdz tuː raɪt ðə ˈletər əˈɡen/", vietnamese: "Anh ấy cần viết lại lá thư." },
+            { fullSentence: "The fruit is bad.", ipa: "/ðə fruːt ɪz bæd/", vietnamese: "Quả này bị hỏng rồi." },
+            { fullSentence: "She buys a small gift.", ipa: "/ʃiː baɪz ə smɔːl ɡɪft/", vietnamese: "Cô ấy mua một món quà nhỏ." },
+            { fullSentence: "Some people cry at the end of a movie.", ipa: "/sʌm ˈpiːpl kraɪ æt ðə end ɒv ə ˈmuːvi/", vietnamese: "Một số người khóc vào cuối phim." },
+            { fullSentence: "He finds his lunch in the bag.", ipa: "/hiː faɪndz hɪz lʌntʃ ɪn ðə bæɡ/", vietnamese: "Anh ấy tìm thấy bữa trưa của mình trong túi." },
+            { fullSentence: "He plays baseball with his friends in the afternoon.", ipa: "/hiː pleɪz ˈbeɪsbɔːl wɪð hɪz frendz ɪn ðə ˌɑːftərˈnuːn/", vietnamese: "Anh ấy chơi bóng chày với bạn bè vào buổi chiều." },
+            { fullSentence: "Please say your address again.", ipa: "/pliːz seɪ jɔːr əˈdres əˈɡen/", vietnamese: "Xin vui lòng nói lại địa chỉ của bạn." },
+            { fullSentence: "The teacher speaks to the student.", ipa: "/ðə ˈtiːtʃər spiːks tuː ðə ˈstjuːdənt/", vietnamese: "Giáo viên nói chuyện với học sinh." },
+            { fullSentence: "She likes to eat sweet snacks.", ipa: "/ʃiː laɪks tuː iːt swiːt snæks/", vietnamese: "Cô ấy thích ăn đồ ăn nhẹ ngọt." },
+            { fullSentence: "Is it true that you have a monkey?", ipa: "/ɪz ɪt truː ðæt juː hæv ə ˈmʌŋki/", vietnamese: "Có thật là bạn có một con khỉ không?" },
+            { fullSentence: "Karen is able to give the right answers.", ipa: "/ˈkærən ɪz ˈeɪbl tuː ɡɪv ðə raɪt ˈɑːnsərz/", vietnamese: "Karen có thể đưa ra câu trả lời đúng." },
+            { fullSentence: "He learns how to make pizza.", ipa: "/hiː lɜːnz haʊ tuː meɪk ˈpiːtsə/", vietnamese: "Anh ấy học cách làm pizza." },
+            { fullSentence: "He likes to drink milk.", ipa: "/hiː laɪks tuː drɪŋk mɪlk/", vietnamese: "Anh ấy thích uống sữa." },
+            { fullSentence: "That is a long word!", ipa: "/ðæt ɪz ə lɒŋ wɜːd/", vietnamese: "Đó là một từ dài!" },
+            { fullSentence: "Class starts in five minutes.", ipa: "/klɑːs stɑːts ɪn faɪv ˈmɪnɪts/", vietnamese: "Lớp học bắt đầu sau năm phút nữa." },
+            { fullSentence: "She sings a great song.", ipa: "/ʃiː sɪŋz ə ɡreɪt sɒŋ/", vietnamese: "Cô ấy hát một bài hát tuyệt vời." },
+            { fullSentence: "The man sits under the tree.", ipa: "/ðə mæn sɪts ˈʌndər ðə triː/", vietnamese: "Người đàn ông ngồi dưới gốc cây." },
+            { fullSentence: "Beth stars in the play.", ipa: "/beθ stɑːz ɪn ðə pleɪ/", vietnamese: "Beth đóng vai chính trong vở kịch." },
+            { fullSentence: "He thinks about what to cook.", ipa: "/hiː θɪŋks əˈbaʊt wɒt tuː kʊk/", vietnamese: "Anh ấy nghĩ về món gì để nấu." },
+            { fullSentence: "Three hundred people live in this town.", ipa: "/θriː ˈhʌndrəd ˈpiːpl lɪv ɪn ðɪs taʊn/", vietnamese: "Ba trăm người sống trong thị trấn này." },
+            { fullSentence: "What time do you eat breakfast?", ipa: "/wɒt taɪm duː juː iːt ˈbrekfəst/", vietnamese: "Bạn ăn sáng lúc mấy giờ?" },
+            { fullSentence: "She carries the animal to the car.", ipa: "/ʃiː ˈkæriz ðə ˈænɪml tuː ðə kɑːr/", vietnamese: "Cô ấy bế con vật lên xe." },
+            { fullSentence: "She buys cheap clothes.", ipa: "/ʃiː baɪz tʃiːp kləʊðz/", vietnamese: "Cô ấy mua quần áo giá rẻ." },
+            { fullSentence: "He counts the people again.", ipa: "/hiː kaʊnts ðə ˈpiːpl əˈɡen/", vietnamese: "Anh ấy đếm lại những người đó." },
+            { fullSentence: "Lisa cuts fruit for her friends to eat.", ipa: "/ˈliːsə kʌts fruːt fɔːr hɜːr frendz tuː iːt/", vietnamese: "Lisa cắt trái cây cho bạn bè ăn." },
+            { fullSentence: "Rob gets up early on weekdays.", ipa: "/rɒb ɡets ʌp ˈɜːli ɒn ˈwiːkdeɪz/", vietnamese: "Rob thức dậy sớm vào các ngày trong tuần." },
+            { fullSentence: "They finish running.", ipa: "/ðeɪ ˈfɪnɪʃ ˈrʌnɪŋ/", vietnamese: "Họ đã chạy xong." },
+            { fullSentence: "She finds a red flower.", ipa: "/ʃiː faɪndz ə red ˈflaʊər/", vietnamese: "Cô ấy tìm thấy một bông hoa màu đỏ." },
+            { fullSentence: "This food is not sweet.", ipa: "/ðɪs fuːd ɪz nɒt swiːt/", vietnamese: "Món ăn này không ngọt." },
+            { fullSentence: "My family likes to eat vegetables.", ipa: "/maɪ ˈfæməli laɪks tuː iːt ˈvedʒtəblz/", vietnamese: "Gia đình tôi thích ăn rau củ." },
+            { fullSentence: "The horses begin to run.", ipa: "/ðə ˈhɔːrsɪz bɪˈɡɪn tuː rʌn/", vietnamese: "Những con ngựa bắt đầu chạy." },
+            { fullSentence: "Her mother does not like her long excuse.", ipa: "/hɜː ˈmʌðər dʌz nɒt laɪk hɜː lɒŋ ɪkˈskjuːs/", vietnamese: "Mẹ cô ấy không thích lời biện hộ dài dòng của cô." },
+            { fullSentence: "The bag is heavy.", ipa: "/ðə bæɡ ɪz ˈhevi/", vietnamese: "Cái túi rất nặng." },
+            { fullSentence: "She buys vegetables at the market in town.", ipa: "/ʃiː baɪz ˈvedʒtəblz æt ðə ˈmɑːkɪt ɪn taʊn/", vietnamese: "Cô ấy mua rau củ ở chợ trong thị trấn." },
+            { fullSentence: "He cuts the meat.", ipa: "/hiː kʌts ðə miːt/", vietnamese: "Anh ấy cắt thịt." },
+            { fullSentence: "It is true. He has a lot of money!", ipa: "/ɪt ɪz truː hiː hæz ə lɒt ɒv ˈmʌni/", vietnamese: "Đó là sự thật. Anh ấy có rất nhiều tiền!" },
+            { fullSentence: "She puts money in the piggy bank.", ipa: "/ʃiː pʊts ˈmʌni ɪn ðə ˈpɪɡi bæŋk/", vietnamese: "Cô ấy bỏ tiền vào con heo đất." },
+            { fullSentence: "She sits in the train station.", ipa: "/ʃiː sɪts ɪn ðə treɪn ˈsteɪʃən/", vietnamese: "Cô ấy ngồi ở nhà ga xe lửa." },
+            { fullSentence: "She speaks English when she visits her friends.", ipa: "/ʃiː spiːks ˈɪŋɡlɪʃ wen ʃiː ˈvɪzɪts hɜːr frendz/", vietnamese: "Cô ấy nói tiếng Anh khi đến thăm bạn bè." },
+            { fullSentence: "Yesterday was bad. She was alone all day.", ipa: "/ˈjestərdeɪ wəz bæd ʃiː wəz əˈləʊn ɔːl deɪ/", vietnamese: "Hôm qua thật tệ. Cô ấy ở một mình cả ngày." }
+        ];
+
+        // --- Game State Variables ---
+        let playerName = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let incorrectAttempts = 0;
+        let shuffledSentences = [];
+        let isGameOver = false;
+        let hintUsed = false; // Thêm biến cờ để theo dõi việc sử dụng gợi ý
+
+        // --- DOM Elements ---
+        const splashScreen = document.getElementById('splash-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const playerNameInput = document.getElementById('player-name-input');
+        const startButton = document.getElementById('start-button');
+        const resetButton = document.getElementById('reset-button');
+        const playAgainButton = document.getElementById('play-again-button');
+        const ipaDisplay = document.getElementById('ipa-display');
+        const vietnameseMeaningDisplay = document.getElementById('vietnamese-meaning'); // Lấy phần tử mới
+        const answerInput = document.getElementById('answer-input');
+        const checkButton = document.getElementById('check-button');
+        const hintButton = document.getElementById('hint-button');
+        const feedbackSplash = document.getElementById('feedback-splash');
+        const feedback = document.getElementById('feedback');
+        const scoreDisplay = document.getElementById('score');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
+        const endMessage = document.getElementById('end-message');
+        const finalScore = document.getElementById('final-score');
+        const hintDisplay = document.getElementById('hint-display');
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startGame);
+        resetButton.addEventListener('click', () => {
+            gameScreen.style.display = 'none';
+            splashScreen.style.display = 'block';
+            clearFeedback();
+        });
+        playAgainButton.addEventListener('click', startGame);
+        checkButton.addEventListener('click', checkAnswer);
+        hintButton.addEventListener('click', giveHint);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        answerInput.addEventListener('focus', () => {
+            hintDisplay.style.display = 'none'; // Ẩn gợi ý khi người dùng bắt đầu nhập
+        });
+
+        // --- Game Logic Functions ---
+        function startGame() {
+            playerName = playerNameInput.value.trim();
+            if (playerName === '') {
+                feedbackSplash.textContent = 'Vui lòng nhập tên của bạn để bắt đầu trò chơi!';
+                feedbackSplash.style.color = '#dc3545';
+                playerNameInput.focus();
+                return;
+            }
+
+            shuffledSentences = shuffleArray([...sentences]);
+            currentQuestionIndex = 0;
+            score = 0;
+            incorrectAttempts = 0;
+            isGameOver = false;
+
+            splashScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+
+            totalQuestionsDisplay.textContent = shuffledSentences.length;
+            updateScore();
+            nextQuestion();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function nextQuestion() {
+            clearFeedback();
+            answerInput.value = '';
+            answerInput.focus();
+            hintButton.style.display = 'none';
+            hintUsed = false; // Đặt lại cờ gợi ý cho câu hỏi mới
+            // Ẩn nghĩa tiếng Việt khi chuyển sang câu hỏi mới
+            vietnameseMeaningDisplay.style.display = 'none';
+
+            if (currentQuestionIndex < shuffledSentences.length) {
+                const questionData = shuffledSentences[currentQuestionIndex];
+                ipaDisplay.textContent = questionData.ipa;
+                incorrectAttempts = 0;
+            } else {
+                endGame();
+            }
+        }
+
+        function checkAnswer() {
+            if (isGameOver) return;
+
+            const userInput = answerInput.value.trim().toLowerCase().replace(/[.,!?;:]/g, '');
+            const correctSentence = shuffledSentences[currentQuestionIndex].fullSentence.toLowerCase().replace(/[.,!?;:]/g, '');
+
+            if (userInput === correctSentence) {
+                if (!hintUsed) {
+                    score++;
+                }
+                updateScore();
+                feedback.textContent = 'Chính xác!';
+                feedback.style.color = '#28a745';
+
+                handleCorrectAnswer();
+            } else {
+                incorrectAttempts++;
+                if (incorrectAttempts >= 2) {
+                    feedback.textContent = `Sai rồi! Thử lại (${incorrectAttempts}/2). Nhấn Gợi Ý nếu bạn không biết.`;
+                    feedback.style.color = '#dc3545';
+                    hintButton.style.display = 'block';
+                } else {
+                    feedback.textContent = `Sai rồi! Thử lại (${incorrectAttempts}/2)`;
+                    feedback.style.color = '#dc3545';
+                    answerInput.value = '';
+                }
+            }
+        }
+
+        function handleCorrectAnswer() {
+            const currentSentence = shuffledSentences[currentQuestionIndex].fullSentence;
+            const currentVietnameseMeaning = shuffledSentences[currentQuestionIndex].vietnamese;
+
+            ipaDisplay.textContent = currentSentence;
+            ipaDisplay.classList.add('flash-text');
+            // Hiển thị nghĩa tiếng Việt
+            vietnameseMeaningDisplay.textContent = currentVietnameseMeaning;
+            vietnameseMeaningDisplay.style.display = 'block';
+
+            playAudio(currentSentence);
+
+            setTimeout(() => {
+                ipaDisplay.classList.remove('flash-text');
+                currentQuestionIndex++;
+                nextQuestion();
+            }, 4000);
+        }
+
+        function giveHint() {
+            const correctSentence = shuffledSentences[currentQuestionIndex].fullSentence;
+            hintDisplay.textContent = `Gợi ý: ${correctSentence}`;
+            hintDisplay.style.display = 'block';
+
+            hintUsed = true; // Đặt cờ gợi ý đã được sử dụng
+
+            setTimeout(() => {
+                hintButton.style.display = 'none';
+            }, 500); // Ẩn nút hint ngay sau khi nhấn
+        }
+
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                feedback.textContent = 'Trình duyệt của bạn không hỗ trợ phát âm.';
+                feedback.style.color = '#dc3545';
+            }
+        }
+
+        function clearFeedback() {
+            feedback.textContent = '';
+            feedbackSplash.textContent = '';
+            hintDisplay.textContent = '';
+            hintDisplay.style.display = 'none';
+            // Đảm bảo nghĩa tiếng Việt được ẩn khi chuyển câu
+            vietnameseMeaningDisplay.textContent = '';
+            vietnameseMeaningDisplay.style.display = 'none';
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = score;
+        }
+
+        function endGame() {
+            isGameOver = true;
+            gameScreen.style.display = 'none';
+            endScreen.style.display = 'block';
+
+            endMessage.textContent = `Chúc mừng, ${playerName}! Bạn đã hoàn thành trò chơi.`;
+            finalScore.textContent = `Bạn đã trả lời đúng ${score} trên tổng số ${shuffledSentences.length} câu.`;
+        }
+    </script>
+</body>
+</html>
